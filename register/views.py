@@ -15,21 +15,6 @@ def idlog(id):
             id
         ))
 
-
-# 【喜欢】【不喜欢】日志
-# 参数1：商品id int
-# 参数2：喜欢或不喜欢 Boolean（该行为失败时，该值无意义）
-# 参数3：该行为成功/失败 Boolean
-def like_log(id, islike, success):
-    with open('./log/like.log', 'a', encoding='utf-8')as f:
-        f.write('%s||id=%s||action=%s||success=%s\n' % (
-            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
-            id,
-            'like' if islike is True else 'dislike',
-            'success' if success is True else 'fail'
-        ))
-
-
 # 注册
 @my_csrf_decorator()
 def register(request):

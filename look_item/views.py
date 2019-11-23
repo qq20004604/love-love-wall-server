@@ -278,9 +278,9 @@ def query_by_keywords(request):
         return get_res_json(code=200, data=result)
 
 # 测试代码
-TEST = False
-
-if TEST is True:
-    res = query_item_by_name_price_des('好用')
-    print('-----------query_item_by_name_price_des-----------')
-    print(res)
+# TEST = False
+#
+# if TEST is True:
+#     res = query_item_by_name_price_des('好用')
+#     print('-----------query_item_by_name_price_des-----------')
+#     print(res)

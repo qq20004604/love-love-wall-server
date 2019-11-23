@@ -8,8 +8,6 @@ from md5_lingling import Md5Tool
 from mysql_lingling import MySQLTool
 from config.mysql_options import mysql_config
 from get_time import get_date_time
-from session_manage import SessionManage
-from config.development_config import IS_ON_WEBPACK_DEVELOPMENT
 
 
 class RegisterManager(object):
@@ -18,6 +16,9 @@ class RegisterManager(object):
 
     def register(self):
         # 取出数据
+        print(self.request.body)
+        if len(self.request.body) is 0:
+            return get_res_json(code=0, msg='需要【邮箱】、【密码】')
         data = json.loads(self.request.body)
         # 验证
         verify_result = self._verify(data)
@@ -52,10 +53,13 @@ class RegisterManager(object):
         # 密码加密
         tool = Md5Tool()
         md5pw = tool.get_md5(password)
+        print(email, md5pw, phone)
 
-        result = self._save_into_mysql(email, md5pw, phone)
+        # result = self._save_into_mysql(email, md5pw, phone)
         # 如果返回结果是 False，说明执行失败
-        return result
+        # return result
+        # todo 测试
+        return get_res_json(code=200, msg="pass")
 
     # 在数据库里进行保存
     def _save_into_mysql(self, email, md5pw, phone):

@@ -67,14 +67,15 @@ class LikesRankingManager(object):
 
 
 if __name__ == '__main__':
+    pass
     # 注意，这个代码要执行的话，要把开始地方的
     # from .query_database import query_likes_dislikes_ranking
     # 改为
     # from query_database import query_likes_dislikes_ranking
-    import sys
-
-    sys.path.append("..")
-    lrm = LikesRankingManager()
-    print(lrm.get_ranking())
-    time.sleep(10)
-    print(lrm.get_ranking())
+    # import sys
+    #
+    # sys.path.append("..")
+    # lrm = LikesRankingManager()
+    # print(lrm.get_ranking())
+    # time.sleep(10)
+    # print(lrm.get_ranking())

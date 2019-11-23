@@ -17,9 +17,9 @@ from django.contrib import admin
 from django.urls import path
 # from register import api_register_manage
 from register import views as register_views
+
 # from login import views as login_views
 # from login import
-from look_item import views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
