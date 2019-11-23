@@ -1,0 +1,17 @@
+anaconda==0.0.1.1
+Click==7.0
+django==2.2.4
+Flask==1.0.2
+itsdangerous==1.1.0
+Jinja2==2.10.1
+MarkupSafe==1.1.1
+mysql-connector==2.2.9
+Pillow==6.0.0
+pytz==2019.1
+redis==3.2.1
+selenium==3.141.0
+SQLAlchemy==1.3.3
+sqlparse==0.3.0
+urllib3==1.24.2
+Werkzeug==0.15.2
+mysql-lingling==0.0.7
