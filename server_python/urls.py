@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 # from register import api_register_manage
-# from register import views as register_views
+from register import views as register_views
 # from login import views as login_views
 # from login import
 from look_item import views
@@ -26,7 +26,7 @@ urlpatterns = [
     # 首页
     # path('', login_views.index),
     # 注册
-    # path('register', register_views.index),
+    path('register', register_views.register),
     # 登陆
     # path('regester_user', api_register_manage.register),
 
@@ -36,12 +36,5 @@ urlpatterns = [
     # path('logout', api_login_manage.logout),
 
     # 登录后首页
-    path('', views.index),
-    # 添加
-    path('add_item', views.add_item),
-    # 关键词搜索
-    path('search/item/keywords', views.query_by_keywords),
-
-    # 测试
-    # path('ACDM/rest/enSureRest/detail', views.test),
+    # path('', views.index),
 ]
