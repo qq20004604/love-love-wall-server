@@ -5,7 +5,7 @@ import time
 
 # 时间格式：YYYY-MM-DD hh:mm:ss
 def get_date_time():
-    return time.strftime("%Y-%m-%d %H:%M:%S.%ms", time.localtime())
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
 
 # 时间格式：YYYY-MM-DD hh:mm:ss.xxx

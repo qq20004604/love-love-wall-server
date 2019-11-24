@@ -22,5 +22,8 @@ def register(request):
         return get_res_json(code=0, msg="请通过POST请求来进行查询")
 
     rm = RegisterManager(request)
-    result = rm.register()
+    data = rm.load_data()
+    if data['is_pass'] is False:
+        return data['res']
+    result = rm.register(data['res'])
     return result
