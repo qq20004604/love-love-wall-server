@@ -127,3 +127,4 @@ dmypy.json
 
 
 config/mysql_options.py
+config/mail_server_config.py
