@@ -15,6 +15,7 @@ def idlog(id):
             id
         ))
 
+
 # 注册
 @my_csrf_decorator()
 def register(request):
@@ -27,3 +28,14 @@ def register(request):
         return data['res']
     result = rm.register(data['res'])
     return result
+
+
+# 邮箱验证
+@my_csrf_decorator()
+def verify_email(request):
+    if request.method != 'GET':
+        return HttpResponse("请通过GET请求来进行查询")
+
+    return render(request, 'verify_email.html', {
+        'path': ''
+    })

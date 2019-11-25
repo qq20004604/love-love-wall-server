@@ -198,5 +198,5 @@ class RegisterManager(object):
     # 返回验证链接
     def _get_verify_href(self, email, vcode):
         host = '127.0.0.1:8000'
-        href = '%s/verify_email/email=%s&vcode=%s' % (host, email, vcode)
+        href = '%s/verify_email?email=%s&vcode=%s' % (host, email, vcode)
         return href

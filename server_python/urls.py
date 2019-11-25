@@ -27,8 +27,8 @@ urlpatterns = [
     # path('', login_views.index),
     # 注册
     path('register', register_views.register),
-    # 登陆
-    # path('regester_user', api_register_manage.register),
+    # 邮箱验证
+    path('verify_email', register_views.verify_email),
 
     # 登陆
     # path('login', api_login_manage.login),
