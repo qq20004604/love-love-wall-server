@@ -127,7 +127,7 @@ class RegisterManager(object):
             row_id = mtool.insert_row(
                 'INSERT user_info'
                 '(id, email, pw, phone, permission, status, create_time, lastlogin_time) VALUES'
-                '(%s, %s,   %s, %s,    3,           0,      %s,          %s)',
+                '(%s, %s,   %s,  %s,    0,          0,      %s,          %s)',
                 [
                     None,
                     email,
@@ -163,14 +163,12 @@ class RegisterManager(object):
         # 1、先检查该邮箱是否已有一条验证数据，有则使之失效
         # 2、插入一条该邮箱的验证信息
         # 1、使之失效
-        mtool.run_sql([
+        mtool.update_row(
+            'UPDATE verify_email SET is_invalid=1 WHERE email=%s',
             [
-                'UPDATE verify_email SET is_invalid=1 WHERE email=%s',
-                [
-                    email
-                ]
+                email
             ]
-        ])
+        )
         # 获取当前时间
         nowtime = get_date_time()
         # 2、插入一条验证信息
