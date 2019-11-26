@@ -22,7 +22,6 @@ class RegisterManager(object):
     def load_data(self):
         data = None
         # 取出数据
-        print(self.request.body)
         if len(self.request.body) is 0:
             return {
                 'is_pass': False,

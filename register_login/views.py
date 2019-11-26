@@ -7,6 +7,7 @@ from decorator_csrf_setting import my_csrf_decorator
 from .class_register import RegisterManager
 from django.utils.datastructures import MultiValueDictKeyError
 from .class_verify_email import VerifyEmail
+from .class_login import LoginManager
 
 
 # 打印访问人的 id
@@ -96,4 +97,30 @@ def login(request):
     if request.method != 'POST':
         return get_res_json(code=0, msg="请通过POST请求来进行查询")
 
-    return get_res_json(code=0, msg="test")
+    lm = LoginManager()
+    # 先读取数据，读取失败返回提示信息
+    load_result = lm.load_data()
+    if load_result['is_pass'] is False:
+        return load_result['res']
+
+    # 然后执行登录的逻辑，查看是否登录成功
+    login_result = lm.login()
+    # code不是200说明失败，返回报错信息
+    # code = 0 返回默认报错信息
+    if login_result['code'] is 0:
+        return get_res_json(code=0, msg=login_result['msg'])
+
+    # code = 1 表示 邮箱未激活，提示用户去激活邮箱
+    if login_result['code'] is 1:
+        # todo 这里跳转的页面应该不一样
+        return get_res_json(code=0, msg=login_result['msg'])
+
+    # code = 200 表示正常
+    if login_result['code'] is 200:
+        user_info_data = login_result['data']
+        # todo 这里添加token到session里
+        # todo 测试时，返回默认提示成功数据
+        return get_res_json(code=0, msg=login_result['msg'])
+
+    # 理论上不应该执行到这里，如果执行到这里，提示错误
+    return get_res_json(code=0, msg="服务器错误")
