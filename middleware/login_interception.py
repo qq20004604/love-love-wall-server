@@ -12,7 +12,7 @@ from tools import is_static_files
 # 不触发登录拦截的URL，每个元素需要是正则表达式
 NOT_INTERCEPT_URLS = [
     # 注册用户
-    r'^/register(.html)?$',
+    r'^/register_login(.html)?$',
     r'^/regester_user$',
     r'^/static'
 ]

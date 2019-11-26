@@ -88,3 +88,12 @@ def verify_email(request):
     return render(request, 'verify_email.html', {
         'path': ''
     })
+
+
+# 登录
+@my_csrf_decorator()
+def login(request):
+    if request.method != 'POST':
+        return get_res_json(code=0, msg="请通过POST请求来进行查询")
+
+    return get_res_json(code=0, msg="test")

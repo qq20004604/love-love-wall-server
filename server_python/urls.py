@@ -15,8 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-# from register import api_register_manage
-from register import views as register_views
+# from register_login import api_register_manage
+from register_login import views as register_views
 
 # from login import views as login_views
 # from login import
@@ -26,12 +26,12 @@ urlpatterns = [
     # 首页
     # path('', login_views.index),
     # 注册
-    path('register', register_views.register),
+    path('register_login', register_views.register),
     # 邮箱验证
     path('verify_email', register_views.verify_email),
-
     # 登陆
-    # path('login', api_login_manage.login),
+    path('login', register_views.login),
+
     # 登出
     # path('logout', api_login_manage.logout),
 
