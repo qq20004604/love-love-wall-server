@@ -19,6 +19,16 @@ def idlog(id):
         ))
 
 
+# 打印访问人的 id
+def login_log(email, code):
+    with open('./log/login.log', 'a', encoding='utf-8')as f:
+        f.write('%s||id=%s||code=%s\n' % (
+            time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            email,
+            code
+        ))
+
+
 # 验证失败的信息
 def verify_failed_log(request):
     with open('./log/verify_email_failed.log', 'a', encoding='utf-8')as f:
@@ -101,6 +111,7 @@ def login(request):
     # 先读取数据，读取失败返回提示信息
     load_result = lm.load_data(request)
     if load_result['is_pass'] is False:
+        login_log(lm.email, -1)
         return load_result['res']
 
     # 然后执行登录的逻辑，查看是否登录成功
@@ -108,11 +119,13 @@ def login(request):
     # code不是200说明失败，返回报错信息
     # code = 0 返回默认报错信息
     if login_result['code'] is 0:
+        login_log(lm.email, 0)
         return get_res_json(code=0, msg=login_result['msg'])
 
     # code = 1 表示 邮箱未激活，提示用户去激活邮箱
     if login_result['code'] is 1:
         # todo 这里跳转的页面应该不一样
+        login_log(lm.email, 1)
         return get_res_json(code=0, msg=login_result['msg'])
 
     # code = 200 表示正常
@@ -120,7 +133,9 @@ def login(request):
         user_info_data = login_result['data']
         # todo 这里添加token到session里
         # todo 测试时，返回默认提示成功数据
+        login_log(lm.email, 200)
         return get_res_json(code=200, msg=login_result['msg'])
 
     # 理论上不应该执行到这里，如果执行到这里，提示错误
-    return get_res_json(code=0, msg="服务器错误")
+    login_log(lm.email, 2)
+    return get_res_json(code=2, msg="服务器错误")
