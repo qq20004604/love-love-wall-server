@@ -162,7 +162,7 @@ class RegisterManager(object):
         # 1、先检查该邮箱是否已有一条验证数据，有则使之失效
         # 2、插入一条该邮箱的验证信息
         # 1、使之失效
-        mtool.update_row(
+        u_result = mtool.update_row(
             'UPDATE verify_email SET is_invalid=1 WHERE email=%s',
             [
                 email
@@ -171,20 +171,17 @@ class RegisterManager(object):
         # 获取当前时间
         nowtime = get_date_time()
         # 2、插入一条验证信息
-        mtool.insert_row(
+        i_result = mtool.insert_row(
             'INSERT verify_email '
-            '(id, email, verify_key, ctime, last_vtime, is_pass, is_invalid) VALUES'
-            '(%s, %s,    %s,         %s,    %s,         %s,      %s)',
+            '(email, verify_key, ctime) VALUES'
+            '(%s,    %s,         %s)',
             [
-                None,
                 email,
                 vcode,
-                nowtime,
-                None,
-                None,
-                None
+                nowtime
             ]
         )
+
 
     # 生成一个验证码
     def _get_verify_code(self):

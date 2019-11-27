@@ -99,7 +99,7 @@ def login(request):
 
     lm = LoginManager()
     # 先读取数据，读取失败返回提示信息
-    load_result = lm.load_data()
+    load_result = lm.load_data(request)
     if load_result['is_pass'] is False:
         return load_result['res']
 

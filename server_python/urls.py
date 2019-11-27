@@ -26,7 +26,7 @@ urlpatterns = [
     # 首页
     # path('', login_views.index),
     # 注册
-    path('register_login', register_views.register),
+    path('register', register_views.register),
     # 邮箱验证
     path('verify_email', register_views.verify_email),
     # 登陆
