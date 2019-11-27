@@ -120,7 +120,7 @@ def login(request):
         user_info_data = login_result['data']
         # todo 这里添加token到session里
         # todo 测试时，返回默认提示成功数据
-        return get_res_json(code=0, msg=login_result['msg'])
+        return get_res_json(code=200, msg=login_result['msg'])
 
     # 理论上不应该执行到这里，如果执行到这里，提示错误
     return get_res_json(code=0, msg="服务器错误")
