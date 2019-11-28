@@ -2,6 +2,7 @@
 
 import sys
 import os
+import session.session_manager
 
 sys.path.append("libs")
 sys.path.append("package")

@@ -8,6 +8,7 @@ from .class_register import RegisterManager
 from django.utils.datastructures import MultiValueDictKeyError
 from .class_verify_email import VerifyEmail
 from .class_login import LoginManager
+from session.session_manager import SM
 
 
 # 打印访问人的 id
@@ -131,11 +132,44 @@ def login(request):
     # code = 200 表示正常
     if login_result['code'] is 200:
         user_info_data = login_result['data']
-        # todo 这里添加token到session里
-        # todo 测试时，返回默认提示成功数据
+        # 将token存到token管理器里
+        token = login_result['token']
+        SM.add(token, user_info_data)
+        request.session['token'] = token
         login_log(lm.email, 200)
         return get_res_json(code=200, msg=login_result['msg'])
 
-    # 理论上不应该执行到这里，如果执行到这里，提示错误
-    login_log(lm.email, 2)
+    # 理论上不应该执行到这里，如果执行到这里，提示错
     return get_res_json(code=2, msg="服务器错误")
+
+
+# 登录
+@my_csrf_decorator()
+def test_login(request):
+    # 没登录的话
+    token = request.session.get('token')
+    if token is None:
+        return get_res_json(code=0, msg='你还没有登录')
+
+    # 然后判断 SM 里该用户是否存在（登录过期判定1）
+    is_exist = SM.is_exist(token)
+    if is_exist is False:
+        # 不存在则删除用户的token
+        request.session.delete('token')
+        return get_res_json(code=0, msg='未登录，或登录超时')
+
+    # 假如存在，判定登录时间是否过期（登录过期判定2）
+    is_expired = SM.is_expire(token)
+    if is_expired is True:
+        # 过期，则删除token
+        SM.delete(token)
+        return get_res_json(code=0, msg='登录超时')
+
+    # 拿取用户信息，并返回
+    user_info = SM.get(token)
+    print(token)
+    return get_res_json(code=200, data=user_info)
+
+
+def test_login_html(request):
+    return render(request, 'login_test.html')

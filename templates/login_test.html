@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="http://119.3.214.234/ajax.js"></script>
+</head>
+<body>
+<button onclick="login()">登录</button>
+<button onclick="getLoginRes()">登录后返回信息</button>
+<script>
+    function login() {
+        $.ajax({
+            url: '/login',
+            type: "post",
+            data: {
+                email: '20004604@qq.com',
+                password: 'wd123456'
+            }
+        }).done(result => {
+            console.log(result)
+        })
+    }
+
+    function getLoginRes() {
+        $.ajax({
+            url: "/test_login",
+            type: "get"
+        }).done(function (val) {
+            console.log(val)
+        }).fail(function (err) {
+            console.error(err);
+        })
+    }
+
+</script>
+</body>
+</html>

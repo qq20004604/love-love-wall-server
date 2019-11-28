@@ -14,11 +14,12 @@ from get_time import get_date_time
 from mail.client import MailManager
 
 
-def get_res(code, msg='', data={}):
+def get_res(code, msg='', data={}, token=''):
     return {
         'code': code,
         'msg': msg,
-        'data': data
+        'data': data,
+        'token': token
     }
 
 
@@ -126,8 +127,8 @@ class LoginManager(object):
             )
 
             # 生成token，返回给用户
-            user_info['token'] = self.make_token()
-            return get_res(code=200, data=user_info)
+            # user_info['token'] = self.make_token()
+            return get_res(code=200, data=user_info, msg='登录成功', token=self.make_token())
 
     def make_token(self):
         length = 20

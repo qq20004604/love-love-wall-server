@@ -31,6 +31,10 @@ urlpatterns = [
     path('verify_email', register_views.verify_email),
     # 登陆
     path('login', register_views.login),
+    # 登陆测试
+    path('test_login', register_views.test_login),
+    # 登陆测试
+    path('test_login.html', register_views.test_login_html),
 
     # 登出
     # path('logout', api_login_manage.logout),
