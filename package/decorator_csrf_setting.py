@@ -3,6 +3,7 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
+
 # CSRF 装饰器，用于区分不同环境，方便开发
 # 非调试模式下（DEBUG = False）启用CSRF
 # 而DEBUG = True模式下，不启用CSRF，方便开发，特别是本机调试
