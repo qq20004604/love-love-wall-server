@@ -5,7 +5,7 @@ import time
 from package.response_data import get_res_json
 from package.decorator_csrf_setting import my_csrf_decorator
 from package.decorator_user_login_log import login_intercept
-from .class_register import RegisterManager
+from .class_register import RegisterManager, SendVerifyEmailAgain
 from django.utils.datastructures import MultiValueDictKeyError
 from .class_verify_email import VerifyEmail
 from .class_login import LoginManager
@@ -74,7 +74,6 @@ def register(request):
 
 
 # 邮箱验证
-@my_csrf_decorator()
 def verify_email(request):
     if request.method != 'GET':
         return HttpResponse("请通过GET请求来进行查询")
@@ -98,9 +97,21 @@ def verify_email(request):
     if res['code'] is 0:
         return HttpResponse(res['msg'])
 
-    return render(request, 'verify_email.html', {
-        'path': ''
-    })
+    return render(request, 'verify_email.html')
+
+
+# 再次发送验证邮件（用于处理没有接受到验证邮件的人）
+@my_csrf_decorator()
+def send_verify_email_again(request):
+    if request.method != 'POST':
+        return HttpResponse("请通过POST请求来进行查询")
+
+    rm = SendVerifyEmailAgain(request)
+    data = rm.load_data()
+    if data['is_pass'] is False:
+        return data['res']
+    result = rm.send_verify_email_again(data['res'])
+    return result
 
 
 # 登录
