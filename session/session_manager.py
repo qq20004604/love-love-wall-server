@@ -10,6 +10,7 @@ import os
 EXPIRE_SECONDS = 60 * 60 * 24
 
 
+# session 管理器
 class SessionManager(object):
     def __init__(self):
         self.session_map = {}
@@ -38,7 +39,9 @@ class SessionManager(object):
 
     # 移除
     def delete(self, key):
-        del self.session_map[key]
+        # 有则删除
+        if key in self.session_map:
+            del self.session_map[key]
 
     # 获取
     def get(self, key):
@@ -47,8 +50,12 @@ class SessionManager(object):
         else:
             return None
 
-    # 判断是否过期
+    # 判断是否过期。True过期，False正常。过期会自动删除token
     def is_expire(self, key):
+        # 先判断是否存在，不存在直接认定为过期
+        if self.is_exist(key) is not True:
+            return True
+
         # 当前时间
         ntime = int(time.time())
         # 超时
@@ -87,8 +94,10 @@ class SessionManager(object):
                 pass
             return
 
-        with open('./session/session.json', 'r') as f:
+        with open('session/session.json', 'r') as f:
             content = f.read()
+            if len(content) <= 0:
+                return
             load_dict = json.loads(content)
             self.session_map = load_dict
 
@@ -100,9 +109,12 @@ class SessionManager(object):
 # 初始化，后面引用的都是他的实例
 SM = SessionManager()
 
-if __name__ == '__main__':
-    # print(SM.get('abc'))
-    # SM.add('abc', 'DDD')
-    # SM.save_session()
-    # print(SM._get_sessions())
-    pass
+# 中间件，用户发起请求时调用。如果登录超时，直接返回登录超时的提示
+
+
+# if __name__ == '__main__':
+# print(SM.get('abc'))
+# SM.add('abc', 'DDD')
+# SM.save_session()
+# print(SM._get_sessions())
+# pass

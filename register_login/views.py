@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render, HttpResponse
 import time
-from response_data import get_res_json
-from decorator_csrf_setting import my_csrf_decorator
+from package.response_data import get_res_json
+from package.decorator_csrf_setting import my_csrf_decorator
+from package.decorator_user_login_log import login_intercept
 from .class_register import RegisterManager
 from django.utils.datastructures import MultiValueDictKeyError
 from .class_verify_email import VerifyEmail
@@ -144,6 +145,7 @@ def login(request):
 
 
 # 登录
+@login_intercept
 @my_csrf_decorator()
 def test_login(request):
     # 没登录的话
