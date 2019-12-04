@@ -155,6 +155,47 @@ def login(request):
     return get_res_json(code=2, msg="服务器错误")
 
 
+# 重置密码（发送邮件）
+def rp_send_mail(request):
+    if request.method != 'POST':
+        return get_res_json(code=0, msg="请通过POST请求来进行查询")
+
+    # 流程梳理：
+    # 1、用户进入申请重置密码页面
+    # 2、输入邮箱地址，并提交重置密码请求（进入本函数，开始进行处理）
+    # 3、验证邮箱是否存在（不存在则返回，并返回提示信息）
+    # 4、验证上一次发送重置密码邮件的时间（每次时间间隔不少于180秒）（低于这个时间，返回提示信息）
+    # 5、生成重置密码的验证码，将验证码插入生成的链接，将链接插入生成的重置密码的邮件文本中
+    # 6、发送验证邮件，并插入一条重置密码的数据，然后返回用户提示信息
+    return get_res_json(code=200, msg="rp_send_mail")
+
+
+# 重置密码（验证链接）
+def rp_verify(request):
+    if request.method != 'GET':
+        return get_res_json(code=0, msg="请通过GET请求来进行查询")
+
+    # 流程梳理：
+    # 1、用户根据连接访问重置密码页面；（进入本函数，开始进行处理）
+    # 2、拿取验证码（失败则返回提示信息）；
+    # 3、查找该验证码是否存在，验证码是否过期（过期时间15分钟），该验证码是否已使用（校验失败，则返回提示信息）
+    # 4、都通过后，返回重置密码的页面，内嵌验证码；
+    return get_res_json(code=200, msg="rp_verify")
+
+
+# 重置密码（重置密码）
+def rp_reset(request):
+    if request.method != 'POST':
+        return get_res_json(code=0, msg="请通过POST请求来进行查询")
+
+    # 流程梳理：
+    # 1、用户根据 rp_verify() 返回的页面，输入密码，然后提交；（进入本函数，开始进行处理）
+    # 2、检查密码、重复密码是否一致，检查验证码是否存在；（校验失败，则返回提示信息）
+    # 3、检查验证码是否过期（校验失败，则返回提示信息）
+    # 4、生成新的密码，使验证码失效，更新用户表里的密码字段的值，遍历token，如果该用户已登录，则清除登录状态，返回用户密码重置成功的提示信息；
+    return get_res_json(code=200, msg="rp_reset")
+
+
 # 登录
 @login_intercept
 @my_csrf_decorator()
@@ -180,7 +221,7 @@ def test_login(request):
 
     # 拿取用户信息，并返回
     user_info = SM.get(token)
-    print(token)
+    # print(token)
     return get_res_json(code=200, data=user_info)
 
 

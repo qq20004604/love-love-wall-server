@@ -33,10 +33,16 @@ urlpatterns = [
     path('send_verify_email', register_views.send_verify_email_again),
     # 登陆
     path('login', register_views.login),
+    # 找回密码：发送邮件
+    path('reset_password/send_mail', register_views.rp_send_mail),
+    # 找回密码：验证邮件里的链接地址
+    path('reset_password/verify', register_views.rp_verify),
+    # 找回密码：重置密码
+    path('reset_password/reset', register_views.rp_reset),
     # 登陆测试
-    path('test_login', register_views.test_login),
+    # path('test_login', register_views.test_login),
     # 登陆测试
-    path('test_login.html', register_views.test_login_html),
+    # path('test_login.html', register_views.test_login_html),
 
     # 登出
     # path('logout', api_login_manage.logout),
