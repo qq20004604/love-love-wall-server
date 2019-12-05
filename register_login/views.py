@@ -9,6 +9,7 @@ from .class_register import RegisterManager, SendVerifyEmailAgain
 from django.utils.datastructures import MultiValueDictKeyError
 from .class_verify_email import VerifyEmail
 from .class_login import LoginManager
+from .class_resetpassword import ResetPasswordManager
 from session.session_manager import SM
 
 
@@ -124,7 +125,7 @@ def login(request):
     # 先读取数据，读取失败返回提示信息
     load_result = lm.load_data(request)
     if load_result['is_pass'] is False:
-        login_log(lm.email, -1)
+        login_log(load_result.email, -1)
         return load_result['res']
 
     # 然后执行登录的逻辑，查看是否登录成功
@@ -167,6 +168,15 @@ def rp_send_mail(request):
     # 4、验证上一次发送重置密码邮件的时间（每次时间间隔不少于180秒）（低于这个时间，返回提示信息）
     # 5、生成重置密码的验证码，将验证码插入生成的链接，将链接插入生成的重置密码的邮件文本中
     # 6、发送验证邮件，并插入一条重置密码的数据，然后返回用户提示信息
+    rpm = ResetPasswordManager()
+    # 先读取数据，读取失败返回提示信息
+    load_result = rpm.load_data(request)
+    if load_result['is_pass'] is False:
+        login_log(load_result.email, -1)
+        return load_result['res']
+
+    send_result = rpm.send_mail(load_result.email)
+    
     return get_res_json(code=200, msg="rp_send_mail")
 
 

@@ -82,3 +82,7 @@ class SendVerifyEmailForm(Form):
                                 'min_length': '【邮箱】长度需要在4~60位之间'
                             }
                             )
+
+
+class SendResetPasswordMailForm(SendVerifyEmailForm):
+    pass
