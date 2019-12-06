@@ -157,6 +157,7 @@ def login(request):
 
 
 # 重置密码（发送邮件）
+@my_csrf_decorator()
 def rp_send_mail(request):
     if request.method != 'POST':
         return get_res_json(code=0, msg="请通过POST请求来进行查询")
@@ -175,9 +176,9 @@ def rp_send_mail(request):
         login_log(load_result.email, -1)
         return load_result['res']
 
-    send_result = rpm.send_mail(load_result.email)
-    
-    return get_res_json(code=200, msg="rp_send_mail")
+    send_result = rpm.send_mail(load_result['res']['email'])
+
+    return send_result
 
 
 # 重置密码（验证链接）
@@ -194,6 +195,7 @@ def rp_verify(request):
 
 
 # 重置密码（重置密码）
+@my_csrf_decorator()
 def rp_reset(request):
     if request.method != 'POST':
         return get_res_json(code=0, msg="请通过POST请求来进行查询")

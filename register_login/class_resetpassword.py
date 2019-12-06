@@ -30,16 +30,16 @@ class ResetPasswordManager(object):
         pass
 
     # 获取请求的数据，并校验（用于标准注册逻辑）
-    def load_data(self):
+    def load_data(self, request):
         data = None
         # 取出数据
-        if len(self.request.body) is 0:
+        if len(request.body) is 0:
             return {
                 'is_pass': False,
                 'res': get_res_json(code=0, msg='需要【邮箱】')
             }
         try:
-            data = json.loads(self.request.body)
+            data = json.loads(request.body)
         except BaseException as e:
             return {
                 'is_pass': False,
@@ -68,9 +68,11 @@ class ResetPasswordManager(object):
             if check_result['is_pass'] is False:
                 return check_result['res']
             # 【5】【6】
-            send_result = self.is_can_send(email, mtool)
+            send_result = self._send_email(email, mtool)
             # 返回邮件发送结果
-            return send_result
+            if send_result.code is 200:
+                return get_res_json(code=200, msg='密码重置邮件发送成功！')
+            return get_res_json(code=0, msg=send_result.msg)
 
     # 能否发送重置密码邮件
     def is_can_send(self, email, mtool):
@@ -94,9 +96,17 @@ class ResetPasswordManager(object):
         # 尝试获取上一次发送信息
         send_result = mtool.run_sql([
             [
-                'SELECT * FROM reset_pw_list WHERE email = %s and is_invalid = 0'
+                'SELECT * FROM reset_pw_list WHERE email = %s and is_invalid = 0',
+                [
+                    email
+                ]
             ]
         ])
+        if send_result is False:
+            return {
+                'is_pass': False,
+                'res': get_res_json(code=0, msg="服务器错误(2)，请稍后再重试")
+            }
 
         if len(send_result) > 0:
             # 说明之前有未生效重置密码的邮件。此时需要判断时间间隔
@@ -116,7 +126,7 @@ class ResetPasswordManager(object):
         }
 
     # 发送邮件
-    def send_email(self, mtool, email):
+    def _send_email(self, mtool, email):
         vcode = self._get_vcode()
         # 获取当前时间
         nowtime = get_date_time()
@@ -177,7 +187,7 @@ class ResetPasswordManager(object):
     # 发送验证邮件（这里可能需要再次发送验证邮件）
     def _send_email(self, email, url):
         mm = MailManager()
-        content = '请点击链接 %s' % url
+        content = '重置密码请点击链接\n%s' % url
         # 这里是测试读取 html 内容（即发送超文本样式），也可以只发纯文本
         # with open('./content.html', 'r', encoding='utf-8') as f:
         #     content = ''.join(f.readlines()).replace(' ', '').replace('\n', '')
