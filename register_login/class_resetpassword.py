@@ -13,6 +13,7 @@ from mysql_lingling import MySQLTool
 from config.mysql_options import mysql_config
 from package.get_time import get_date_time
 from package.mail.client import MailManager
+from package.href_str import get_href
 
 # 重置密码的验证邮件发送间隔
 PW_RWSET_MAILSEND_DURATION_SEC = 180
@@ -159,7 +160,7 @@ class ResetPasswordManager(object):
         # 【5】生成连接
         url = self._get_reset_url(email, vcode)
         # 此时跳转到邮件发送提示页面，提示用户点击邮箱里的链接进行验证
-        send_result = self._send_resetpw_email(mtool, email, url)
+        send_result = self._send_resetpw_email(email, url)
 
         # 发送失败——》返回错误信息
         if send_result.code is not 200:
@@ -179,9 +180,14 @@ class ResetPasswordManager(object):
         return vcode
 
     def _get_reset_url(self, email, vcode):
-        HOST = '127.0.0.1:8000'
-        url = '%s/reset_password/verify?email=%s&vcode=%s' % (HOST, email, vcode)
-        return url
+        # HOST = 'http://127.0.0.1:8000'
+        # search_s = percentEncode('email=%s&vcode=%s' % (email, vcode))
+        # url = '%s/reset_password/verify?%s' % (HOST, search_s)
+        href = get_href('reset_password/verify', {
+            'email': email,
+            'vcode': vcode
+        })
+        return href
 
     # 发送验证邮件（这里可能需要再次发送验证邮件）
     def _send_resetpw_email(self, email, url):

@@ -12,14 +12,21 @@ from mysql_lingling import MySQLTool
 from config.mysql_options import mysql_config
 from package.get_time import get_date_time
 from package.mail.client import MailManager
+from package.href_str import get_href
 
+# 账号激活邮件发送间隔
 DURATION_SEC_SEND_VERIFY_TIME = 60
 
 
 # 返回验证链接
 def _get_verify_href(email, vcode):
-    HOST = '127.0.0.1:8000'
-    href = '%s/verify_email?email=%s&vcode=%s' % (HOST, email, vcode)
+    # HOST = 'http://127.0.0.1:8000'
+    # search_s = get_search_str()
+    # href = '%s/verify_email?%s' % (HOST, search_s)
+    href = get_href('verify_email', {
+        'email': email,
+        'vcode': vcode
+    })
     return href
 
 
@@ -64,7 +71,7 @@ class RegisterManager(object):
     def _send_verify_email(self, email, vcode):
         mm = MailManager()
         href = _get_verify_href(email, vcode)
-        content = '请点击链接 %s' % href
+        content = '请点击链接\n%s' % href
         # 这里是测试读取 html 内容（即发送超文本样式），也可以只发纯文本
         # with open('./content.html', 'r', encoding='utf-8') as f:
         #     content = ''.join(f.readlines()).replace(' ', '').replace('\n', '')

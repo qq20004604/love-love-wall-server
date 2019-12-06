@@ -4,14 +4,12 @@
 import json
 import random
 import string
-import re
 from .forms import LoginForm
-from response_data import get_res_json
-from md5_lingling import Md5Tool
+from libs.md5_lingling import Md5Tool
 from mysql_lingling import MySQLTool
 from config.mysql_options import mysql_config
-from get_time import get_date_time
-from mail.client import MailManager
+from package.response_data import get_res_json
+from package.get_time import get_date_time
 
 
 def get_res(code, msg='', data={}, token=''):
