@@ -68,11 +68,9 @@ class ResetPasswordManager(object):
             if check_result['is_pass'] is False:
                 return check_result['res']
             # 【5】【6】
-            send_result = self._send_email(email, mtool)
+            send_result = self.send(mtool, email)
             # 返回邮件发送结果
-            if send_result.code is 200:
-                return get_res_json(code=200, msg='密码重置邮件发送成功！')
-            return get_res_json(code=0, msg=send_result.msg)
+            return send_result
 
     # 能否发送重置密码邮件
     def is_can_send(self, email, mtool):
@@ -119,14 +117,14 @@ class ResetPasswordManager(object):
             if sec_dur <= PW_RWSET_MAILSEND_DURATION_SEC:
                 return {
                     'is_pass': False,
-                    'res': get_res_json(code=0, msg="每次发送密码重置邮件的间隔应该大于180秒")
+                    'res': get_res_json(code=0, msg="每次发送密码重置邮件的间隔不能少于180秒，请稍后再重新尝试发送")
                 }
         return {
             'is_pass': True
         }
 
     # 发送邮件
-    def _send_email(self, mtool, email):
+    def send(self, mtool, email):
         vcode = self._get_vcode()
         # 获取当前时间
         nowtime = get_date_time()
@@ -144,8 +142,8 @@ class ResetPasswordManager(object):
         # 数据库插入一行记录（用于之后重置密码时校验使用）
         row_id = mtool.insert_row(
             'INSERT reset_pw_list'
-            '(id, email, verify_key, c_time, last_vtime, is_pass, is_invalid) VALUES'
-            '(%s, %s,    0,          %s,     %s,         0,       0)',
+            '(id, email, verify_key, ctime, last_vtime, is_pass, is_invalid) VALUES'
+            '(%s, %s,    %s,          %s,     %s,         0,       0)',
             [
                 None,
                 email,
@@ -160,7 +158,8 @@ class ResetPasswordManager(object):
 
         # 【5】生成连接
         url = self._get_reset_url(email, vcode)
-        send_result = self._send_email(mtool, email, url)
+        # 此时跳转到邮件发送提示页面，提示用户点击邮箱里的链接进行验证
+        send_result = self._send_resetpw_email(mtool, email, url)
 
         # 发送失败——》返回错误信息
         if send_result.code is not 200:
@@ -185,7 +184,7 @@ class ResetPasswordManager(object):
         return url
 
     # 发送验证邮件（这里可能需要再次发送验证邮件）
-    def _send_email(self, email, url):
+    def _send_resetpw_email(self, email, url):
         mm = MailManager()
         content = '重置密码请点击链接\n%s' % url
         # 这里是测试读取 html 内容（即发送超文本样式），也可以只发纯文本
