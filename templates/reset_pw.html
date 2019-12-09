@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>重置密码</title>
+    <script src="http://119.3.214.234/ajax.js"></script>
+</head>
+<body>
+<div>
+    <span>邮箱：</span>
+    <input type="text" id="email">
+</div>
+<div>
+    <span>密码：</span>
+    <input type="text" id="pw">
+</div>
+<div>
+    <span>重复密码：</span>
+    <input type="text" id="rp-pw">
+</div>
+<div>
+    <button onClick="resetPW()">提交</button>
+</div>
+
+<script>
+    const $ = function (selector) {
+        return document.querySelector(selector)
+    }
+
+    function resetPW() {
+        $.ajax({
+            url: '/reset_password/reset',
+            type: "post",
+            data: {
+                email: $("#email").value,
+                vcode:{{ vcode }},
+                password: $("#pw").value,
+                rp_password: $("#rp-pw").value,
+            }
+        }).done(result => {
+            console.log(result)
+        })
+    }
+</script>
+</body>
+</html>
