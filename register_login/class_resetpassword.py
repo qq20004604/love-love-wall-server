@@ -8,12 +8,11 @@ import re
 import time
 from .forms import SendResetPasswordMailForm, VerifyRPHrefForm
 from package.response_data import get_res_json
-from libs.md5_lingling import Md5Tool
 from mysql_lingling import MySQLTool
 from config.mysql_options import mysql_config
 from package.get_time import get_date_time
 from package.mail.client import MailManager
-from .config import ResetPwSendMailVcodeLength, HOST, ResetPWSendMailExpireTimeCn, ResetPWSendMailExpireTime
+from .config import ResetPwSendMailVcodeLength, ResetPWSendMailExpireTimeCn, ResetPWSendMailExpireTime
 from django.utils.datastructures import MultiValueDictKeyError
 from package.href_str import get_href
 
@@ -170,7 +169,7 @@ class ResetPwSendMailManager(object):
         row_id = mtool.insert_row(
             'INSERT reset_pw_list'
             '(id, email, verify_key, ctime, last_vtime, is_pass, is_invalid) VALUES'
-            '(%s, %s,    %s,          %s,     %s,         0,       0)',
+            '(%s, %s,    %s,         %s,    %s,         0,       0)',
             [
                 None,
                 email,
