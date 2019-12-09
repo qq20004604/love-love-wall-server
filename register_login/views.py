@@ -32,7 +32,7 @@ def login_log(email, code):
         ))
 
 
-# 验证失败的信息
+# 账号激活失败的信息
 def verify_failed_log(request):
     with open('./log/verify_email_failed.log', 'a', encoding='utf-8')as f:
         # 获取用户ip
@@ -74,8 +74,8 @@ def register(request):
     return result
 
 
-# 邮箱验证
-def verify_email(request):
+# 账号激活
+def activate_account(request):
     if request.method != 'GET':
         return HttpResponse("请通过GET请求来进行查询")
     is_error = False
@@ -103,7 +103,7 @@ def verify_email(request):
 
 # 再次发送验证邮件（用于处理没有接受到验证邮件的人）
 @my_csrf_decorator()
-def send_verify_email_again(request):
+def send_activate_email_again(request):
     if request.method != 'POST':
         return HttpResponse("请通过POST请求来进行查询")
 
@@ -193,9 +193,8 @@ def rp_verify(request):
     # 4、都通过后，返回重置密码的页面，内嵌验证码；
     rpm = ResetPasswordManager()
     # 先读取数据，读取失败返回提示信息
-    load_result = rpm.load_data(request)
+    load_result = rpm.load_data_verify(request)
     if load_result['is_pass'] is False:
-        login_log(load_result.email, -1)
         return load_result['res']
     verify_result = rpm.verify_vcode(load_result['res']['email'], load_result['res']['vcode'])
     # 验证不通过

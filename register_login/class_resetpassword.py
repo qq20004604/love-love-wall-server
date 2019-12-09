@@ -82,13 +82,7 @@ class ResetPwSendMailManager(object):
                 mtool.set_uncommit()
                 return check_result['res']
             # 【5】【6】
-            send_result = self.send(mtool, email)
-            # 返回邮件发送结果
-            if send_result.code is 200:
-                return get_res_json(code=200, msg='密码重置邮件发送成功！')
-            # 回滚数据库操作
-            mtool.set_uncommit()
-            return get_res_json(code=0, msg=send_result.msg)
+            return self.send(mtool, email)
 
     # 能否发送重置密码邮件
     def is_can_send(self, email, mtool):
@@ -268,7 +262,8 @@ class ResetPasswordManager(object):
             msg = uf.get_form_error_msg()
             return {
                 'is_pass': False,
-                'res': get_res_json(code=0, msg=msg)
+                'res': get_res_json(code=0, msg=msg),
+                'data': data
             }
         return {
             'is_pass': True,
@@ -310,7 +305,7 @@ class ResetPasswordManager(object):
                        database=mysql_config['database']) as mtool:
             verify_result = self._is_vcode_correct(mtool, email, vcode)
             if verify_result['is_pass'] is True:
-                return get_res(code=200)
+                return get_res(code=200, msg='success')
             else:
                 return get_res(code=0, msg=verify_result['res'])
 
@@ -318,7 +313,7 @@ class ResetPasswordManager(object):
     def _is_vcode_correct(self, mtool, email, vcode):
         search_result = mtool.run_sql([
             [
-                'SELECT * FROM reset_pw_list WHERE email = %s and vcode = %s and is_invaild = 0',
+                'SELECT * FROM reset_pw_list WHERE email = %s and verify_key = %s and is_invalid = 0',
                 [
                     email,
                     vcode

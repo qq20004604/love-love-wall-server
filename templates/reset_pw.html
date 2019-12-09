@@ -9,6 +9,7 @@
     <script src="http://119.3.214.234/ajax.js"></script>
 </head>
 <body>
+<h1>密码重置</h1>
 <div>
     <span>邮箱：</span>
     <input type="text" id="email">
@@ -36,9 +37,12 @@
             type: "post",
             data: {
                 email: $("#email").value,
-                vcode:{{ vcode }},
+                vcode: '{{ vcode }}',
                 password: $("#pw").value,
                 rp_password: $("#rp-pw").value,
+            },
+            headers: {
+                'X-CSRFToken': "{{ csrf_token }}"
             }
         }).done(result => {
             console.log(result)

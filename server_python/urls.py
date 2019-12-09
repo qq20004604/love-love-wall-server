@@ -28,9 +28,9 @@ urlpatterns = [
     # 注册
     path('register', register_views.register),
     # 邮箱验证
-    path('verify_email', register_views.verify_email),
+    path('activate_account', register_views.activate_account),
     # 邮箱验证（再次发送验证邮件）
-    path('send_verify_email', register_views.send_verify_email_again),
+    path('send_activate_email', register_views.send_activate_email_again),
     # 登陆
     path('login', register_views.login),
     # 找回密码：发送邮件
