@@ -332,11 +332,19 @@ class ResetPasswordManager(object):
         last_sec = int(time.mktime(ctime.timetuple()))
         now_sec = int(time.time())
         sec_dur = now_sec - last_sec
+        # 更新最后访问时间
+        mtool.update_row(
+            'UPDATE reset_pw_list SET last_vtime=%s WHERE email=%s and is_invalid=0',
+            [
+                get_date_time(),
+                email
+            ]
+        )
         # 超时
         if sec_dur > ResetPWSendMailExpireTime:
             # 设置该条数据失效
             mtool.update_row(
-                'UPDATE reset_pw_list SET is_invalid=1 WHERE email=%s and is_invaild=0',
+                'UPDATE reset_pw_list SET is_invalid=1 WHERE email=%s and is_invalid=0',
                 [
                     email
                 ]
@@ -344,7 +352,7 @@ class ResetPasswordManager(object):
             # 返回提示信息
             return {
                 'is_pass': False,
-                'res': '邮箱或验证码错误，请尝试重新发送密码重置邮件'
+                'res': '链接已过期，请重新发送密码重置邮件'
             }
         # 此时说明可用
         return {
