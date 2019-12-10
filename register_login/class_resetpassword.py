@@ -6,8 +6,9 @@ import random
 import string
 import re
 import time
-from .forms import SendResetPasswordMailForm, VerifyRPHrefForm
+from .forms import SendResetPasswordMailForm, VerifyRPHrefForm, ResetPasswordForm
 from package.response_data import get_res_json
+from libs.md5_lingling import Md5Tool
 from mysql_lingling import MySQLTool
 from config.mysql_options import mysql_config
 from package.get_time import get_date_time
@@ -277,20 +278,33 @@ class ResetPasswordManager(object):
         if len(request.body) is 0:
             return {
                 'is_pass': False,
-                'res': get_res_json(code=0, msg='需要【验证码】')
+                'res': get_res_json(code=0, msg='缺少参数')
             }
         try:
             data = json.loads(request.body)
+            uf = ResetPasswordForm(data)
+            # 验证不通过，返回错误信息
+            if not uf.is_valid():
+                msg = uf.get_form_error_msg()
+                return {
+                    'is_pass': False,
+                    'res': get_res_json(code=0, msg=msg),
+                    'data': data
+                }
+            if data['password'] != data['rp_password']:
+                return {
+                    'is_pass': False,
+                    'res': get_res_json(code=0, msg='两次密码输入的内容不同')
+                }
+            return {
+                'is_pass': True,
+                'data': data
+            }
         except BaseException as e:
             return {
                 'is_pass': False,
                 'res': get_res_json(code=0, msg='数据非法')
             }
-
-        return {
-            'is_pass': True,
-            'res': data
-        }
 
     # 校验验证码
     def verify_vcode(self, email, vcode):
@@ -313,7 +327,7 @@ class ResetPasswordManager(object):
     def _is_vcode_correct(self, mtool, email, vcode):
         search_result = mtool.run_sql([
             [
-                'SELECT * FROM reset_pw_list WHERE email = %s and verify_key = %s and is_invalid = 0',
+                'SELECT * FROM reset_pw_list WHERE email = %s and verify_key = %s',
                 [
                     email,
                     vcode
@@ -328,7 +342,10 @@ class ResetPasswordManager(object):
                 'is_pass': False,
                 'res': '邮箱或验证码错误'
             }
+        # 拿到数据
         ctime = search_result[0][3]
+        is_pass = search_result[0][5]
+        is_invalid = search_result[0][6]
         last_sec = int(time.mktime(ctime.timetuple()))
         now_sec = int(time.time())
         sec_dur = now_sec - last_sec
@@ -340,6 +357,21 @@ class ResetPasswordManager(object):
                 email
             ]
         )
+        # 已使用
+        if is_pass is 1:
+            # 返回提示信息
+            return {
+                'is_pass': False,
+                'res': '链接已失效，请重新使用密码重置功能'
+            }
+        # 已使用
+        if is_invalid is 1:
+            # 返回提示信息
+            return {
+                'is_pass': False,
+                'res': '链接已过期，请重新使用密码重置功能'
+            }
+
         # 超时
         if sec_dur > ResetPWSendMailExpireTime:
             # 设置该条数据失效
@@ -352,7 +384,7 @@ class ResetPasswordManager(object):
             # 返回提示信息
             return {
                 'is_pass': False,
-                'res': '链接已过期，请重新发送密码重置邮件'
+                'res': '链接已过期，请重新使用密码重置功能'
             }
         # 此时说明可用
         return {
@@ -361,9 +393,85 @@ class ResetPasswordManager(object):
 
     # 重置密码
     # 参数：邮箱，验证码，密码，重复密码
-    def reset_pw(self, email, vcode, pw, rp_pw):
-        pass
+    def reset_pw(self, email, vcode, pw):
+        print(email, vcode, pw)
+        # 流程梳理
+        # 1、检查能否重置
+        # 2、重置密码
+        # 3、发送重置密码成功的通知邮件
+        with MySQLTool(host=mysql_config['host'],
+                       user=mysql_config['user'],
+                       password=mysql_config['pw'],
+                       port=mysql_config['port'],
+                       database=mysql_config['database']) as mtool:
+            # 【1】
+            verify_result = self._is_vcode_correct(mtool, email, vcode)
+            if verify_result['is_pass'] is False:
+                return get_res(code=0, msg=verify_result['res'])
+            # 【2】
+            reset_result = self._pw_reset(mtool, email, pw)
+            # 重置密码失败
+            if reset_result['is_pass'] is False:
+                return reset_result['res']
+            # 【3】
+            self._send_success_mail(email)
+            # 无论发送邮件成功或失败，都提示用户密码重置成功
+            return get_res_json(code=200, data={
+                'msg': '密码重置成功'
+            })
 
     # 密码重置
-    def _pw_reset(self, email, pw):
-        pass
+    def _pw_reset(self, mtool, email, pw):
+        # 密码加密
+        tool = Md5Tool()
+        md5pw = tool.get_md5(pw)
+        u_result = mtool.update_row(
+            'UPDATE user_info SET pw = %s WHERE email = %s',
+            [
+                md5pw,
+                email
+            ]
+        )
+        if u_result is False or u_result is 0:
+            # 回滚数据库操作
+            mtool.set_uncommit()
+            return {
+                'is_pass': False,
+                'res': get_res_json(code=0, msg='服务器错误(0)，请重试')
+            }
+
+        # 此时，还要让之前更新密码那行数据失效
+        u_reset = mtool.update_row(
+            'UPDATE reset_pw_list SET is_invalid=1 and is_pass=1 WHERE email=%s',
+            [
+                email
+            ]
+        )
+        if u_reset is False or u_reset is 0:
+            # 回滚数据库操作
+            mtool.set_uncommit()
+            return {
+                'is_pass': False,
+                'res': get_res_json(code=0, msg='服务器错误(1)，请重试')
+            }
+        return {
+            'is_pass': True
+        }
+
+    # 发送密码重置成功邮件
+    def _send_success_mail(self, email):
+        mm = MailManager()
+        content = '你的账号，修改密码成功，如果有疑问，请联系管理员'
+        # 这里是测试读取 html 内容（即发送超文本样式），也可以只发纯文本
+        # with open('./content.html', 'r', encoding='utf-8') as f:
+        #     content = ''.join(f.readlines()).replace(' ', '').replace('\n', '')
+        mail_data = {
+            'receiver': [email],
+            'title': '表白墙密码【修改成功】通知',
+            'content': content,
+            'account': '使用邮件服务的账号（指服务，而不是邮箱的账号）',
+            'pw': '使用邮件服务的密码（指服务，而不是邮箱的密码）'
+        }
+        res2 = mm.send_mail(mail_data)
+        # print(res2)
+        return res2

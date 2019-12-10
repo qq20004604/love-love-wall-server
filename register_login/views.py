@@ -219,7 +219,15 @@ def rp_reset(request):
     # 2、检查密码、重复密码是否一致，检查验证码是否存在；（校验失败，则返回提示信息）
     # 3、检查验证码是否过期（校验失败，则返回提示信息）
     # 4、生成新的密码，使验证码失效，更新用户表里的密码字段的值，遍历token，如果该用户已登录，则清除登录状态，返回用户密码重置成功的提示信息；
-    return get_res_json(code=200, msg="rp_reset")
+    rpm = ResetPasswordManager()
+    # 先读取数据，读取失败返回提示信息
+    load_result = rpm.load_data_reset(request)
+    if load_result['is_pass'] is False:
+        return load_result['res']
+
+    d = load_result['data']
+    reset_result = rpm.reset_pw(d['email'], d['vcode'], d['password'])
+    return reset_result
 
 
 # 登录

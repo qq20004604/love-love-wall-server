@@ -13,7 +13,7 @@ def get_res_json(code=200, data={}, msg="success"):
         "data": data
     }
     data = json.dumps(d)
-    print(data)
+    # print(data)
     return HttpResponse(data, content_type="application/json")
 
 
