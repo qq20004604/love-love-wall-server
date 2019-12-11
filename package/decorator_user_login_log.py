@@ -39,6 +39,8 @@ def login_intercept_log(request):
 def login_intercept(func):
     def expire_response(request):
         login_intercept_log(request)
+        # 清除token
+        request.session.delete('token')
         return get_res_json(code=-1, msg='登录过期')
 
     def wrapper(*args, **kwargs):
@@ -47,6 +49,8 @@ def login_intercept(func):
         # 如果该用户登录过期、或者 token 不存在
         if SM.is_expire(token) is True:
             # 此时说明登录过期/用户不存在
+            # 清除 token
+            SM.delete(token)
             # 返回登录拦截的函数
             return expire_response(*args, **kwargs)
         else:

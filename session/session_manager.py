@@ -80,6 +80,7 @@ class SessionManager(object):
 
     # 将session写入文件
     def save_session(self):
+        print('-------- save session --------')
         with open('./session/session.json', 'w') as f:
             json.dump(self.session_map, f)
 

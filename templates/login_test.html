@@ -8,6 +8,7 @@
 <body>
 <button onclick="login()">登录</button>
 <button onclick="getLoginRes()">登录后返回信息</button>
+<button onclick="Logout()">登出</button>
 <script>
     function login() {
         $.ajax({
@@ -26,6 +27,17 @@
         $.ajax({
             url: "/test_login",
             type: "get"
+        }).done(function (val) {
+            console.log(val)
+        }).fail(function (err) {
+            console.error(err);
+        })
+    }
+
+    function Logout() {
+        $.ajax({
+            url: "/logout",
+            type: "post"
         }).done(function (val) {
             console.log(val)
         }).fail(function (err) {

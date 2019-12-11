@@ -39,13 +39,12 @@ urlpatterns = [
     path('reset_password/verify', register_views.rp_verify),
     # 找回密码：重置密码
     path('reset_password/reset', register_views.rp_reset),
+    # 找回密码：重置密码
+    path('logout', register_views.logout),
     # 登陆测试
     # path('test_login', register_views.test_login),
     # 登陆测试
-    # path('test_login.html', register_views.test_login_html),
-
-    # 登出
-    # path('logout', api_login_manage.logout),
+    path('test_login.html', register_views.test_login_html),
 
     # 登录后首页
     # path('', views.index),

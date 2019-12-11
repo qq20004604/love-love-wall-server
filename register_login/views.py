@@ -156,6 +156,27 @@ def login(request):
     return get_res_json(code=2, msg="服务器错误")
 
 
+# 登出
+@my_csrf_decorator()
+@login_intercept
+def logout(request):
+    if request.method != 'POST':
+        return get_res_json(code=0, msg="请通过POST请求访问接口")
+
+    # 没登录的话
+    token = request.session.get('token')
+    if token is None:
+        return get_res_json(code=0, msg='你还没有登录，不需要登出喔')
+
+    # 注意，此时可以排除登录过期的情况（login_intercept 已经处理过了）
+    # 清除登录信息，分别清除内存和用户 session 里的
+    SM.delete(token)
+    request.session.delete('token')
+    return get_res_json(code=200, msg="success", data={
+        'msg': '登出成功'
+    })
+
+
 # 重置密码（发送邮件）
 @my_csrf_decorator()
 def rp_send_mail(request):
