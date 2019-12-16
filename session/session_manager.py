@@ -29,6 +29,7 @@ class SessionManager(object):
         self.save_session()
         # 再延迟1分钟
         time.sleep(60)
+        print('- save_session 60s -')
 
     # 新增，key是token，value是用户信息
     def add(self, key, user_auth):
