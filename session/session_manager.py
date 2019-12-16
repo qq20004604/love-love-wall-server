@@ -15,7 +15,7 @@ class SessionManager(object):
     def __init__(self):
         self.session_map = {}
         # 初始化时，先从文件读取session
-        self.load_session()
+        # self.load_session()
         # 开一个新线程，执行定期清空 event_pool
         t1 = threading.Thread(target=self.loop)
         t1.setDaemon(True)
@@ -26,10 +26,10 @@ class SessionManager(object):
         # 先清空过期session
         self.clear_expire_session()
         # 此时我们session里都是未过期的了，将其写入文件
-        self.save_session()
+        # self.save_session()
         # 再延迟1分钟
         time.sleep(60)
-        print('- save_session 60s -')
+        print('- clear_Expire_session 60s -')
 
     # 新增，key是token，value是用户信息
     def add(self, key, user_auth):
@@ -82,7 +82,7 @@ class SessionManager(object):
     # 将session写入文件
     def save_session(self):
         print('-------- save session --------')
-        with open('./session/session.json', 'w') as f:
+        with open('session/session.json', 'w') as f:
             json.dump(self.session_map, f)
 
     # 从文件读取session
