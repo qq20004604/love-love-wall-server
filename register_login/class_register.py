@@ -127,7 +127,7 @@ class RegisterManager(object):
                        database=mysql_config['database']) as mtool:
             # 查看有没有同名的用户
             result = mtool.run_sql([
-                ['select (email) from user_info where email = %s', [email]]
+                ['select (email) from user_auth where email = %s', [email]]
             ])
             # 打印结果e
             print(result)
@@ -140,7 +140,7 @@ class RegisterManager(object):
 
             # 插入
             row_id = mtool.insert_row(
-                'INSERT user_info'
+                'INSERT user_auth'
                 '(id, email, pw, phone, permission, status, create_time, lastlogin_time) VALUES'
                 '(%s, %s,   %s,  %s,    0,          0,      %s,          %s)',
                 [
@@ -306,7 +306,7 @@ class SendVerifyEmailAgain(object):
         # 4.2、大于等于间隔时间，直接发送验证邮件（返回，告诉用户已发送）；
         select_ui_result = mtool.run_sql([
             [
-                'SELECT count(*) FROM user_info WHERE email = %s',
+                'SELECT count(*) FROM user_auth WHERE email = %s',
                 [
                     email
                 ]

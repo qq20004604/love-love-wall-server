@@ -31,10 +31,10 @@ class SessionManager(object):
         time.sleep(60)
 
     # 新增，key是token，value是用户信息
-    def add(self, key, user_info):
+    def add(self, key, user_auth):
         self.session_map[key] = {
             'ctime': int(time.time()),
-            'data': user_info
+            'data': user_auth
         }
 
     # 移除
