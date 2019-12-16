@@ -89,7 +89,7 @@ class ResetPwSendMailManager(object):
     def is_can_send(self, email, mtool):
         exist_result = mtool.run_sql([
             [
-                'SELECT * FROM user_info WHERE email = %s',
+                'SELECT * FROM user_auth WHERE email = %s',
                 [
                     email
                 ]
@@ -426,7 +426,7 @@ class ResetPasswordManager(object):
         tool = Md5Tool()
         md5pw = tool.get_md5(pw)
         u_result = mtool.update_row(
-            'UPDATE user_info SET pw = %s WHERE email = %s',
+            'UPDATE user_auth SET pw = %s WHERE email = %s',
             [
                 md5pw,
                 email

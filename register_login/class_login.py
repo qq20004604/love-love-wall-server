@@ -69,7 +69,7 @@ class LoginManager(object):
 
     # 登录
     def login(self):
-        # 1、从user_info表里拉取数据
+        # 1、从user_auth表里拉取数据
         # 1.1、失败，返回并提示报错信息
         # 1.2、没有拉取到符合条件的用户、，返回并提示报错信息
         # 1.3、拉取正常，进入2
@@ -88,7 +88,7 @@ class LoginManager(object):
                        database=mysql_config['database']) as mtool:
             select_result = mtool.run_sql([
                 [
-                    'SELECT * FROM user_info WHERE email = %s and pw = %s',
+                    'SELECT * FROM user_auth WHERE email = %s and pw = %s',
                     [
                         email,
                         pw
@@ -102,14 +102,14 @@ class LoginManager(object):
             if len(select_result) is 0:
                 return get_res(code=0, msg='用户名/密码错误或用户不存在')
 
-            user_info = {
+            user_auth = {
                 'id': select_result[0][0],
                 'email': select_result[0][1],
                 'permission': select_result[0][4],
                 'status': select_result[0][5],
             }
 
-            if user_info['permission'] is 0:
+            if user_auth['permission'] is 0:
                 return get_res(code=1, msg='邮箱未激活')
 
             # 获取当前时间
@@ -117,16 +117,16 @@ class LoginManager(object):
 
             # 更新最后登录时间
             mtool.update_row(
-                'UPDATE user_info SET lastlogin_time = %s WHERE id = %',
+                'UPDATE user_auth SET lastlogin_time = %s WHERE id = %',
                 [
                     nowtime,
-                    user_info['id']
+                    user_auth['id']
                 ]
             )
 
             # 生成token，返回给用户
-            # user_info['token'] = self.make_token()
-            return get_res(code=200, data=user_info, msg='登录成功', token=self.make_token())
+            # user_auth['token'] = self.make_token()
+            return get_res(code=200, data=user_auth, msg='登录成功', token=self.make_token())
 
     def make_token(self):
         length = 20

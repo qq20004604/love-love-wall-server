@@ -16,36 +16,22 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 # from register_login import api_register_manage
-from register_login import views as register_views
+from register_login import urls as register_urls
+from django.conf import settings
 
-# from login import views as login_views
-# from login import
-
-urlpatterns = [
-    # path('admin/', admin.site.urls),
-    # 首页
-    # path('', login_views.index),
-    # 注册
-    path('register', register_views.register),
-    # 邮箱验证
-    path('activate_account', register_views.activate_account),
-    # 邮箱验证（再次发送验证邮件）
-    path('send_activate_email', register_views.send_activate_email_again),
-    # 登陆
-    path('login', register_views.login),
-    # 找回密码：发送邮件
-    path('reset_password/send_mail', register_views.rp_send_mail),
-    # 找回密码：验证邮件里的链接地址
-    path('reset_password/verify', register_views.rp_verify),
-    # 找回密码：重置密码
-    path('reset_password/reset', register_views.rp_reset),
-    # 找回密码：重置密码
-    path('logout', register_views.logout),
-    # 登陆测试
-    # path('test_login', register_views.test_login),
-    # 登陆测试
-    path('test_login.html', register_views.test_login_html),
-
-    # 登录后首页
-    # path('', views.index),
+# 正常的 url 在添加到这个 list 里
+url_list = [
+    register_urls.urlpatterns
 ]
+urlpatterns = []
+for url in url_list:
+    urlpatterns = urlpatterns + url
+
+# 测试环境下才可用的url，放在这个 list 里
+test_url_list = [
+    register_urls.urlpatterns_test
+]
+
+if settings.DEBUG is True:
+    for test_url in test_url_list:
+        urlpatterns = urlpatterns + test_url

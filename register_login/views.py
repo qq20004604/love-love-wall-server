@@ -144,10 +144,10 @@ def login(request):
 
     # code = 200 表示正常
     if login_result['code'] is 200:
-        user_info_data = login_result['data']
+        user_auth_data = login_result['data']
         # 将token存到token管理器里
         token = login_result['token']
-        SM.add(token, user_info_data)
+        SM.add(token, user_auth_data)
         request.session['token'] = token
         login_log(lm.email, 200)
         return get_res_json(code=200, msg=login_result['msg'])
@@ -275,9 +275,9 @@ def test_login(request):
         return get_res_json(code=0, msg='登录超时')
 
     # 拿取用户信息，并返回
-    user_info = SM.get(token)
+    user_auth = SM.get(token)
     # print(token)
-    return get_res_json(code=200, data=user_info)
+    return get_res_json(code=200, data=user_auth)
 
 
 def test_login_html(request):

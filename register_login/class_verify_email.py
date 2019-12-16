@@ -59,13 +59,13 @@ class VerifyEmail(object):
                 return get_res(code=0, msg='激活失败（0），请重试或者联系管理员。QQ：20004604，微信：qq20004604')
 
             # 再修改用户表，设置账号状态为启用
-            affect_user_info_rows = mtool.update_row(
-                'UPDATE user_info SET permission = 1 WHERE email = %s',
+            affect_user_auth_rows = mtool.update_row(
+                'UPDATE user_auth SET permission = 1 WHERE email = %s',
                 [
                     email
                 ]
             )
-            if affect_user_info_rows is False or affect_user_info_rows is 0:
+            if affect_user_auth_rows is False or affect_user_auth_rows is 0:
                 mtool.set_uncommit()
                 return get_res(code=0, msg='激活失败（1），请重试或者联系管理员。QQ：20004604，微信：qq20004604')
 
