@@ -15,23 +15,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
 # from register_login import api_register_manage
 from register_login import urls as register_urls
-from django.conf import settings
+from user_info import urls as userinfo_urls
 
 # 正常的 url 在添加到这个 list 里
 url_list = [
-    register_urls.urlpatterns
+    register_urls,
+    userinfo_urls
 ]
 urlpatterns = []
 for url in url_list:
-    urlpatterns = urlpatterns + url
+    urlpatterns = urlpatterns + url.urlpatterns
 
 # 测试环境下才可用的url，放在这个 list 里
 test_url_list = [
-    register_urls.urlpatterns_test
+    register_urls,
+    userinfo_urls
 ]
 
 if settings.DEBUG is True:
     for test_url in test_url_list:
-        urlpatterns = urlpatterns + test_url
+        urlpatterns = urlpatterns + test_url.urlpatterns_test
