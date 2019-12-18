@@ -24,10 +24,16 @@ SECRET_KEY = '(&a$&we^pmn)*k+=p#yscbx9gr1r@27k_rf@14af2s8cyt_06-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# SERVER_HOST = '122.51.197.193'
+SERVER_HOST = '127.0.0.1'
+SERVER_PORT = 8000
+SERVER_ORIGIN = 'http://%s:%s' % (SERVER_HOST, SERVER_PORT)
+
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    '119.3.214.234'
+    # '119.3.214.234'
+    SERVER_HOST
 ]
 
 # Application definition

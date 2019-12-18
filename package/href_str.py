@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import urllib.parse
+from django.conf import settings
 
 
 # 将一般字符串转为可以用在 href 里的字符串
@@ -34,7 +35,7 @@ def get_search_str(d):
 #    'vcode': vcode
 # })
 # 返回 http://127.0.0.1:8000/reset_password/verify?email=xxx&vcode=yyy
-def get_href(path, d, HOST='http://127.0.0.1:8000'):
+def get_href(path, d, HOST=settings.SERVER_ORIGIN):
     search_s = get_search_str(d)
     href = '%s/%s?%s' % (HOST, path, search_s)
     return href
