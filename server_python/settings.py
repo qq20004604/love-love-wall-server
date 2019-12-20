@@ -29,6 +29,9 @@ SERVER_HOST = '127.0.0.1'
 SERVER_PORT = 8000
 SERVER_ORIGIN = 'http://%s:%s' % (SERVER_HOST, SERVER_PORT)
 
+# 是否允许发送邮件（测试时，部分情况不允许发送邮件，因此在这里统一管理）
+ALLOWE_SEND_EMAIL = False
+
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',

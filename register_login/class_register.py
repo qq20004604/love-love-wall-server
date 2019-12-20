@@ -13,6 +13,7 @@ from config.mysql_options import mysql_config
 from package.get_time import get_date_time
 from package.mail.client import MailManager
 from package.href_str import get_href
+from django.conf import settings
 
 # 账号激活邮件发送间隔
 DURATION_SEC_SEND_VERIFY_TIME = 60
@@ -154,24 +155,40 @@ class RegisterManager(object):
             )
 
             if row_id is False:
+                mtool.uncommit()
+                return get_res_json(code=0, msg='注册失败')
+
+            # 插入数据到 user_info 表里
+            insert_ui_result = self.insert_userinfo(mtool, email)
+            if insert_ui_result['is_pass'] is False:
+                mtool.uncommit()
                 return get_res_json(code=0, msg='注册失败')
 
             vcode = self._get_verify_code()
             self._insert_info_into_verify(mtool, email, vcode)
 
-        # 发送激活邮件给用户
-        send_result = self._send_verify_email(email, vcode)
+        # 允许发送邮件
+        if settings.ALLOWE_SEND_EMAIL is True:
+            # 发送激活邮件给用户
+            send_result = self._send_verify_email(email, vcode)
+            # 发送失败——》返回错误信息
+            if send_result.code is not 200:
+                return get_res_json(code=200, data={
+                    'msg': send_result.msg
+                })
 
-        # 发送失败——》返回错误信息
-        if send_result.code is not 200:
+            # 此时跳转到邮件发送提示页面，提示用户点击邮箱里的链接进行验证
             return get_res_json(code=200, data={
-                'msg': send_result.msg
+                'msg': '用户注册成功，已发送激活邮件，请访问邮箱打开激活邮件以激活账号'
             })
-
-        # 此时跳转到邮件发送提示页面，提示用户点击邮箱里的链接进行验证
-        return get_res_json(code=200, data={
-            'msg': '用户注册成功，已发送激活邮件，请访问邮箱打开激活邮件以激活账号'
-        })
+        else:
+            href = _get_verify_href(email, vcode)
+            content = '请访问链接激活账号：\n%s' % href
+            # 此时跳转到邮件发送提示页面，提示用户点击邮箱里的链接进行验证
+            return get_res_json(code=200, data={
+                'msg': content,
+                'href': href
+            })
 
     # 插入一条邮箱验证信息
     def _insert_info_into_verify(self, mtool, email, vcode):
@@ -203,6 +220,25 @@ class RegisterManager(object):
         length = 30
         vcode = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(length))
         return vcode
+
+    # 在 user_info 表里插入数据
+    def insert_userinfo(self, mtool, email):
+        insert_result = mtool.insert_row(
+            'INSERT user_info'
+            '(id)'
+            'SELECT id FROM user_auth WHERE email=%s',
+            [
+                email
+            ]
+        )
+        if insert_result is not False and insert_result > 0:
+            return {
+                'is_pass': True
+            }
+        else:
+            return {
+                'is_pass': False
+            }
 
 
 class SendVerifyEmailAgain(object):

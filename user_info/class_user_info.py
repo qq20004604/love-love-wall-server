@@ -6,7 +6,7 @@ import random
 import string
 import re
 import time
-from .forms import SendResetPasswordMailForm, VerifyRPHrefForm, ResetPasswordForm
+from .forms import UserInfoForm
 from package.response_data import get_res_json
 from libs.md5_lingling import Md5Tool
 from mysql_lingling import MySQLTool
@@ -21,18 +21,19 @@ class UserInfoManager(object):
     def __init__(self):
         pass
 
-    # 获取请求的数据，并校验（用于发送重置密码邮件逻辑）
-    def load_data(self, request):
+    # 获取请求的数据
+    def load_data(self, request, id):
         data = None
         # 取出数据
         if len(request.body) is 0:
             return {
                 'is_pass': False,
-                'res': get_res_json(code=0, msg='需要【邮箱】')
+                'res': get_res_json(code=0, msg='数据非法(0)')
             }
         try:
             data = json.loads(request.body)
-            uf = SendResetPasswordMailForm(data)
+            data['id'] = id
+            uf = UserInfoForm(data)
             # 验证不通过，返回错误信息
             if not uf.is_valid():
                 msg = uf.get_form_error_msg()
@@ -42,10 +43,14 @@ class UserInfoManager(object):
                 }
             return {
                 'is_pass': True,
-                'res': data
+                'data': data
             }
         except BaseException as e:
             return {
                 'is_pass': False,
-                'res': get_res_json(code=0, msg='数据非法')
+                'res': get_res_json(code=0, msg='数据非法(1)')
             }
+
+    # 判断数据是否存在
+    def is_userinfo_exist(self):
+        pass

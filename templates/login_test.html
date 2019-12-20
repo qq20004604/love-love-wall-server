@@ -8,6 +8,7 @@
 <body>
 <button onclick="login()">登录</button>
 <button onclick="getLoginRes()">登录后返回信息</button>
+<button onclick="updateUserInfo()">修改用户信息</button>
 <button onclick="Logout()">登出</button>
 <script>
     function login() {
@@ -22,6 +23,8 @@
             console.log(result)
         })
     }
+
+    login()
 
     function getLoginRes() {
         $.ajax({
@@ -42,6 +45,38 @@
             console.log(val)
         }).fail(function (err) {
             console.error(err);
+        })
+    }
+
+    function updateUserInfo() {
+        $.ajax({
+            url: '/userinfo/get',
+            type: "post",
+            headers: {
+                'X-CSRFToken': "{{ csrf_token }}"
+            },
+            data: {
+                nickname: 'nickname',
+                avatar: 'avatar',
+                qq: '20004604',
+                wechat: 'wechat',
+                other: 'other',
+                gender: 'male',
+                target_gender: 'tgen',
+                age: 30,
+                target_age: '20-25',
+                tag: 'tag',
+                ideal: 'ideal',
+                company: 'company',
+                city: 'city',
+                income: 'income',
+                target_income: 'target_income',
+                college: 'college',
+                profession: 'profession',
+                summary: 'summary'
+            }
+        }).done(result => {
+            console.log(result)
         })
     }
 
