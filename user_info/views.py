@@ -24,6 +24,4 @@ def get_userinfo(request):
     if load_result['is_pass'] is False:
         return load_result['res']
     data = load_result['data']
-    print(data)
-
-    return get_res_json(code=200, msg="test")
+    return um.update(data)
