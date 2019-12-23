@@ -8,6 +8,7 @@ from user_info import views as views
 urlpatterns = [
     # 注册
     path('userinfo/get', views.get_userinfo),
+    path('userinfo/update', views.update_userinfo),
 ]
 
 urlpatterns_test = [

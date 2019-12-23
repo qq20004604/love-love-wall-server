@@ -46,7 +46,7 @@ class UserInfoDict(object):
     # 获取 mysql 的 insert 语句。
     # 这里指假如有一个mysql的语句 INSERT user_info (id, nickname) VALUES (xx,xx)
     # 这里指的就是获取 "INSERT user_info (id, nickname) VALUES ()" 这部分（不包含 values 括号里面的内容，但含外面的括号）
-    def get_mysql_sql(self, data):
+    def get_mysql_update_sql(self, data):
         sql = self.__get_mysql_update(data)
         val_list = self.__get_mysql_value_list(data)
         return {
@@ -69,12 +69,43 @@ class UserInfoDict(object):
     # 参考上面，括号里的
     # 入参是用户传的值
     def __get_mysql_value_list(self, data):
-        l = []
+        l = [
+            'id'
+        ]
         for i in self.USER_INFO_DICT:
             k = i[0]
             if data.get(k) is not None:
                 l.append(data[k])
         return l
+
+    # 获取 mysql 的 select 语句
+    def get_mysql_select_sql(self, id):
+        col_list = [
+            # 'id'
+        ]
+        for i in self.USER_INFO_DICT:
+            col_list.append(i[0])
+        col_str = ','.join(col_list)
+
+        sql = 'SELECT %s FROM user_info WHERE id = %s' % (col_str, '%s')
+        return {
+            'sql': sql,
+            'val_list': [id]
+        }
+
+    # 这个是将 mysql 查询出来的那个 list 转为一个 dict
+    def get_mysql_select_data(self, data):
+        # mysql 查询到的是一个二维数组，因此先拿到这一行
+        row_data = data[0]
+        # 然后由于查询到的结果，是按上面 get_mysql_select_sql 里拼接的顺序返回的，因此可以获取到一个dict
+        d = {
+            # 'id': row_data[0]
+        }
+        # 新建一个数组
+        for i in range(len(self.USER_INFO_DICT)):
+            k = self.USER_INFO_DICT[i][0]
+            d[k] = row_data[i]
+        return d
 
 
 uid = UserInfoDict()
@@ -116,7 +147,7 @@ class UserInfoManager(object):
 
     # 判断数据是否存在
     def update(self, data):
-        d = uid.get_mysql_sql(data)
+        d = uid.get_mysql_update_sql(data)
         print(d)
         with MySQLTool(host=mysql_config['host'],
                        user=mysql_config['user'],
@@ -131,3 +162,23 @@ class UserInfoManager(object):
                 return get_res_json(code=200, msg='修改成功')
             else:
                 return get_res_json(code=0, msg='修改用户信息失败')
+
+    # 获取用户信息
+    def get_userinfo(self, id):
+        d = uid.get_mysql_select_sql(id)
+        with MySQLTool(host=mysql_config['host'],
+                       user=mysql_config['user'],
+                       password=mysql_config['pw'],
+                       port=mysql_config['port'],
+                       database=mysql_config['database']) as mtool:
+            print(d)
+            select_result = mtool.run_sql([
+                [
+                    d['sql'],
+                    d['val_list']
+                ]
+            ])
+            if select_result is False:
+                return get_res_json(code=0, msg='查询用户信息失败')
+            userinfo = uid.get_mysql_select_data(select_result)
+            return get_res_json(code=200, data=userinfo)

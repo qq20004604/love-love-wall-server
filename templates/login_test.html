@@ -8,6 +8,7 @@
 <body>
 <button onclick="login()">登录</button>
 <button onclick="getLoginRes()">登录后返回信息</button>
+<button onclick="getUserInfo()">获取用户信息</button>
 <button onclick="updateUserInfo()">修改用户信息</button>
 <button onclick="Logout()">登出</button>
 <script>
@@ -48,9 +49,21 @@
         })
     }
 
-    function updateUserInfo() {
+    function getUserInfo() {
         $.ajax({
             url: '/userinfo/get',
+            type: "get",
+            headers: {
+                'X-CSRFToken': "{{ csrf_token }}"
+            }
+        }).done(result => {
+            console.log(result)
+        })
+    }
+
+    function updateUserInfo() {
+        $.ajax({
+            url: '/userinfo/update',
             type: "post",
             headers: {
                 'X-CSRFToken': "{{ csrf_token }}"
