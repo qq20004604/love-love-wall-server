@@ -6,9 +6,11 @@ from django.urls import path
 from user_info import views as views
 
 urlpatterns = [
-    # 注册
+    # 用户信息
     path('userinfo/get', views.get_userinfo),
     path('userinfo/update', views.update_userinfo),
+    # 用户信息（用户获取其他用户的信息）
+    # path('userinfo/user', views.other_get_userinfo),
 ]
 
 urlpatterns_test = [

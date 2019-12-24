@@ -40,7 +40,9 @@ class UserInfoDict(object):
             ['target_income', '期望对方收入'],
             ['college', '学校'],
             ['profession', '专业'],
-            ['summary', '一句话介绍']
+            ['summary', '一句话介绍'],
+            ['is_hidden', '是否全部隐藏不显示'],
+            ['hidden_columns', '隐藏的列名，以逗号分隔']
         ]
 
     # 获取 mysql 的 update 语句。

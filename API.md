@@ -343,7 +343,9 @@ GET
         "target_income": "target_income",
         "college": "college",
         "profession": "profession",
-        "summary": null
+        "summary": null,
+        "is_hidden": 0,
+        "hidden_columns": 'nickname'
     }
 }
 ```
@@ -386,7 +388,9 @@ POST
     target_income: 'target_income',
     college: 'college',
     profession: 'profession',
-    summary: 'summary'
+    summary: 'summary',
+    is_hidden: 0,
+    hidden_columns: 'nickname'
 }
 ```
 
