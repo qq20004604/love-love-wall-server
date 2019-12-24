@@ -297,3 +297,105 @@ POST
    }
 }
 ```
+
+### 9、获取用户信息
+
+说明：
+
+```
+获取用户信息
+GET
+```
+
+链接：
+
+```
+/userinfo/get
+```
+
+入参：
+
+```
+无
+```
+
+出参：
+
+```
+{
+    "code": 200,
+    "msg": "success",
+    "data": {
+        "nickname": "nickname",
+        "avatar": "avatar",
+        "qq": "20004604",
+        "wechat": "wechat",
+        "other": "other",
+        "gender": "male",
+        "target_gender": "tgen",
+        "age": 30,
+        "target_age": "20-25",
+        "tag": "tag",
+        "ideal": "ideal",
+        "company": "company",
+        "city": "city",
+        "income": "income",
+        "target_income": "target_income",
+        "college": "college",
+        "profession": "profession",
+        "summary": null
+    }
+}
+```
+
+
+### 10、修改用户信息
+
+说明：
+
+```
+修改用户信息
+所有字段非必填，不填或者值为null则不会修改，但空字符串会修改该属性值
+POST
+```
+
+链接：
+
+```
+/userinfo/update
+```
+
+入参：
+
+```
+{
+    nickname: 'avatar',
+    avatar: 'avatar',
+    qq: '20004604',
+    wechat: 'wechat',
+    other: 'other',
+    gender: 'male',
+    target_gender: 'tgen',
+    age: 30,
+    target_age: '20-25',
+    tag: 'tag',
+    ideal: 'ideal',
+    company: 'company',
+    city: 'city',
+    income: 'income',
+    target_income: 'target_income',
+    college: 'college',
+    profession: 'profession',
+    summary: 'summary'
+}
+```
+
+出参：
+
+```
+{
+    "code": 200,
+    "msg": "修改成功",
+    "data": {}
+}
+```

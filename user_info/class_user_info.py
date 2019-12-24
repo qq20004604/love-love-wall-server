@@ -43,9 +43,8 @@ class UserInfoDict(object):
             ['summary', '一句话介绍']
         ]
 
-    # 获取 mysql 的 insert 语句。
-    # 这里指假如有一个mysql的语句 INSERT user_info (id, nickname) VALUES (xx,xx)
-    # 这里指的就是获取 "INSERT user_info (id, nickname) VALUES ()" 这部分（不包含 values 括号里面的内容，但含外面的括号）
+    # 获取 mysql 的 update 语句。
+    # 一个获取 sql 语句，一个获取 sql 参数
     def get_mysql_update_sql(self, data):
         sql = self.__get_mysql_update(data)
         val_list = self.__get_mysql_value_list(data)
@@ -69,9 +68,7 @@ class UserInfoDict(object):
     # 参考上面，括号里的
     # 入参是用户传的值
     def __get_mysql_value_list(self, data):
-        l = [
-            'id'
-        ]
+        l = []
         for i in self.USER_INFO_DICT:
             k = i[0]
             if data.get(k) is not None:
