@@ -28,5 +28,5 @@ urlpatterns_test = [
     # 登陆测试
     path('test_login', register_views.test_login),
     # 登陆测试
-    path('test_login.html', register_views.test_login_html),
+    path('test.html', register_views.test_login_html),
 ]

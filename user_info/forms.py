@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 from form import Form, forms
 from django.core.validators import RegexValidator
+from .config import USER_INFO_DICT
+
+uid = []
+for i in USER_INFO_DICT:
+    uid.append((i[0]))
+uid_t = tuple(uid)
 
 
 # 注册
@@ -149,3 +155,28 @@ class UserInfoForm(Form):
                                   'max_length': '【简介】长度应小于100位'
                               }
                               )
+    is_hidden = forms.IntegerField(label='is_hidden',
+                                   required=False,
+                                   min_value=0,
+                                   max_value=1,
+                                   error_messages={
+                                       'min_value': '是否隐藏，只能为0或1',
+                                       'max_value': '是否隐藏，只能为0或1',
+                                   }
+                                   )
+    # hidden_columns = forms.CharField(label='hidden_columns',
+    #                                  max_length=255,
+    #                                  required=False,
+    #                                  error_messages={
+    #                                      'max_length': '【隐藏列】数据错误'
+    #                                  }
+    #                                  )
+    # hidden_columns = forms.fields.MultipleChoiceField(
+    #     choices=uid_t,
+    #     label="hidden_columns",
+    #     initial=uid,
+    #     error_messages={
+    #         'min_value': '是否隐藏，只能为0或1',
+    #         'max_value': '是否隐藏，只能为0或1',
+    #     }
+    # )

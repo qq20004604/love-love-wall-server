@@ -15,35 +15,13 @@ from package.get_time import get_date_time
 from package.mail.client import MailManager
 from django.utils.datastructures import MultiValueDictKeyError
 from package.href_str import get_href
+from .config import USER_INFO_DICT
 
 
 # user_info表的字典表管理器
 class UserInfoDict(object):
     def __init__(self):
-        # 每个list元素表示一个字段。
-        # list第一个元素表示表头，list第二个元素表示他的中文
-        self.USER_INFO_DICT = [
-            ['nickname', '用户昵称'],
-            ['avatar', '头像'],
-            ['qq', 'QQ'],
-            ['wechat', '微信'],
-            ['other', '其他联系方式'],
-            ['gender', '性别'],
-            ['target_gender', '期望对方性别'],
-            ['age', '期望对方年龄'],
-            ['target_age', '期望对方年龄'],
-            ['tag', '个人标签'],
-            ['ideal', '理想'],
-            ['company', '公司'],
-            ['city', '所在城市'],
-            ['income', '收入'],
-            ['target_income', '期望对方收入'],
-            ['college', '学校'],
-            ['profession', '专业'],
-            ['summary', '一句话介绍'],
-            ['is_hidden', '是否全部隐藏不显示'],
-            ['hidden_columns', '隐藏的列名，以逗号分隔']
-        ]
+        self.USER_INFO_DICT = USER_INFO_DICT
 
     # 获取 mysql 的 update 语句。
     # 一个获取 sql 语句，一个获取 sql 参数
@@ -55,26 +33,31 @@ class UserInfoDict(object):
             'val_list': val_list
         }
 
+    # 获取 sql 不含最后的值的语句（防止sql注入）
     def __get_mysql_update(self, data):
         fields_list = []
         for i in self.USER_INFO_DICT:
             k = i[0]
             if data.get(k) is not None:
-                fields_list.append('%s=%s' % (i[0], '%s'))
+                # 这个时候分为两种情况，一般字符串，或者是 list
+                fields_list.append('%s=%s' % (k, '%s'))
 
         fields = ','.join(fields_list)
         s = 'UPDATE user_info SET %s WHERE id=%s' % (fields, data.get('id'))
         return s
 
-    # 获取 mysql 的 insert 的值
+    # 获取 mysql 的值
     # 参考上面，括号里的
     # 入参是用户传的值
     def __get_mysql_value_list(self, data):
         l = []
         for i in self.USER_INFO_DICT:
             k = i[0]
-            if data.get(k) is not None:
-                l.append(data[k])
+            v = data.get(k)
+            if v is not None:
+                if type(v) is list:
+                    v = ','.join(v)
+                l.append(v)
         return l
 
     # 获取 mysql 的 select 语句
@@ -126,7 +109,16 @@ class UserInfoManager(object):
         try:
             data = json.loads(request.body)
             data['id'] = id
+            hidden_columns = None
+            # uf.is_valid() 校验数组类型的时候非法，所以玩点骚操作
+            if data['hidden_columns'] is not None:
+                # 将该行数据暂时取出来
+                hidden_columns = data['hidden_columns']
+                # 从 data 里移除 hidden_columns 属性
+                del data['hidden_columns']
+            # 处理过的数据再搞到数组里
             uf = UserInfoForm(data)
+
             # 验证不通过，返回错误信息
             if not uf.is_valid():
                 msg = uf.get_form_error_msg()
@@ -134,11 +126,32 @@ class UserInfoManager(object):
                     'is_pass': False,
                     'res': get_res_json(code=0, msg=msg)
                 }
+            # 再把数据加回去
+            if hidden_columns is not None:
+                data['hidden_columns'] = hidden_columns
+            # 由于我不会用 django 的 form 校验数组，因此这里追加校验数组
+            # 数组的校验，是通过 USER_INFO_DICT 的第四个元素——函数来校验的
+            # 其他类型，也可以通过 这个函数 来追加校验
+            # 1. 先遍历 USER_INFO_DICT
+            for col_info in USER_INFO_DICT:
+                # 2. 如果没有第四个参数，则继续下一个
+                if len(col_info) < 4 or col_info[3] is None:
+                    continue
+                else:
+                    # 3. 有函数的话，进行函数校验
+                    if col_info[3](data[col_info[0]]) is False:
+                        # 校验失败，返回报错信息
+                        return {
+                            'is_pass': False,
+                            'res': get_res_json(code=0, msg='%s数据非法(2)' % col_info[0])
+                        }
+
             return {
                 'is_pass': True,
                 'data': data
             }
         except BaseException as e:
+            print(e)
             return {
                 'is_pass': False,
                 'res': get_res_json(code=0, msg='数据非法(1)')

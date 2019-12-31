@@ -69,7 +69,7 @@
                 'X-CSRFToken': "{{ csrf_token }}"
             },
             data: {
-                nickname: 'avatar',
+                nickname: 'nickname',
                 avatar: 'avatar',
                 qq: '20004604',
                 wechat: 'wechat',
@@ -88,7 +88,7 @@
                 profession: 'profession',
                 summary: 'summary',
                 is_hidden: 0,
-                hidden_columns: 'nickname',
+                hidden_columns: ['avatar', 'wechat'],
             }
         }).done(result => {
             console.log(result)

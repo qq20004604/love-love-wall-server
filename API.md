@@ -345,7 +345,7 @@ GET
         "profession": "profession",
         "summary": null,
         "is_hidden": 0,
-        "hidden_columns": 'nickname'
+        "hidden_columns": ['qq', 'avatar']  // 注意，nickname 不能被隐藏
     }
 }
 ```
@@ -390,7 +390,7 @@ POST
     profession: 'profession',
     summary: 'summary',
     is_hidden: 0,
-    hidden_columns: 'nickname'
+    hidden_columns: ['qq', 'avatar']
 }
 ```
 
