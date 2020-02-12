@@ -1,6 +1,6 @@
 anaconda==0.0.1.1
 Click==7.0
-django==2.2.4
+django==2.2.10
 Flask==1.0.2
 itsdangerous==1.1.0
 Jinja2==2.10.1
