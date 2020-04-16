@@ -35,7 +35,7 @@ ALLOWE_SEND_EMAIL = False
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    # '119.3.214.234'
+    # '122.51.197.193'
     SERVER_HOST
 ]
 
